@@ -1,0 +1,27 @@
+[build]
+  command = "npm run build"
+  publish = "client/build"
+  functions = "netlify/functions"
+
+[dev]
+  command = "npm run dev"
+  targetPort = 5000
+  functionsPort = 9999
+
+[[redirects]]
+  from = "/api/movies/*"
+  to = "/.netlify/functions/movies/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/streams/*"
+  to = "/.netlify/functions/streams/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/health"
+  to = "/.netlify/functions/health"
+  status = 200
+  force = true
