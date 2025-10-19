@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #18181b;
+  min-height: 100vh;
+}
+
+:root {
+  --primary-700: #7c3aed;
+  --primary-600: #a78bfa;
+  --dark-main: #18181b;
+  --dark-card: #23232a;
+}
+
+.bg-dark-main {
+  background-color: var(--dark-main);
+}
+.bg-dark-card {
+  background-color: var(--dark-card);
+}
+.bg-primary-700 {
+  background-color: var(--primary-700);
+}
+.bg-primary-600 {
+  background-color: var(--primary-600);
+}
+
+.shadow-xl {
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+}
