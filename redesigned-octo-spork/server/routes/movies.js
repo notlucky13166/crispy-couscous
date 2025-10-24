@@ -83,6 +83,87 @@ router.get('/popular', async (req, res) => {
   }
 });
 
+// Discover movies with filters
+router.get('/discover', async (req, res) => {
+  try {
+    const { genre, sortBy = 'popularity.desc', page = 1 } = req.query;
+
+    const params = {
+      api_key: TMDB_API_KEY,
+      sort_by: sortBy,
+      page,
+      include_adult: false
+    };
+
+    if (genre) {
+      params.with_genres = genre;
+    }
+
+    const response = await axios.get(`${TMDB_BASE_URL}/discover/movie`, {
+      params
+    });
+
+    const movies = response.data.results.map(movie => ({
+      id: movie.id,
+      title: movie.title,
+      overview: movie.overview,
+      posterPath: movie.poster_path,
+      backdropPath: movie.backdrop_path,
+      releaseDate: movie.release_date,
+      rating: movie.vote_average,
+      voteCount: movie.vote_count,
+      genreIds: movie.genre_ids
+    }));
+
+    res.json({
+      movies,
+      totalPages: response.data.total_pages,
+      totalResults: response.data.total_results,
+      page: response.data.page
+    });
+  } catch (error) {
+    console.error('Error discovering movies:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to discover movies' });
+  }
+});
+
+// Get movie recommendations
+router.get('/:id/recommendations', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { page = 1 } = req.query;
+
+    const response = await axios.get(`${TMDB_BASE_URL}/movie/${id}/recommendations`, {
+      params: {
+        api_key: TMDB_API_KEY,
+        page
+      }
+    });
+
+    const movies = response.data.results.map(movie => ({
+      id: movie.id,
+      title: movie.title,
+      overview: movie.overview,
+      posterPath: movie.poster_path,
+      backdropPath: movie.backdrop_path,
+      releaseDate: movie.release_date,
+      rating: movie.vote_average,
+      voteCount: movie.vote_count,
+      genreIds: movie.genre_ids
+    }));
+
+    res.json({
+      movies,
+      totalPages: response.data.total_pages,
+      totalResults: response.data.total_results,
+      page: response.data.page
+    });
+  } catch (error) {
+    console.error('Error fetching recommendations:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to fetch recommendations' });
+  }
+});
+
 // Get movie details
 router.get('/:id', async (req, res) => {
   try {

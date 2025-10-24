@@ -16,17 +16,45 @@ const MoviePlayer = () => {
   const [error, setError] = useState(null);
 
 
+  const updateWatchHistory = useCallback((movieData) => {
+    if (typeof window === 'undefined' || !movieData) {
+      return;
+    }
+
+    try {
+      const stored = localStorage.getItem('watchedMovies');
+      const history = stored ? JSON.parse(stored) : [];
+
+      const filteredHistory = history.filter((item) => item.id !== movieData.id);
+      const entry = {
+        id: movieData.id,
+        title: movieData.title,
+        posterPath: movieData.posterPath,
+        backdropPath: movieData.backdropPath,
+        releaseDate: movieData.releaseDate,
+        rating: movieData.rating,
+        genres: movieData.genres?.map((genre) => genre.id) || []
+      };
+
+      const updatedHistory = [entry, ...filteredHistory].slice(0, 20);
+      localStorage.setItem('watchedMovies', JSON.stringify(updatedHistory));
+    } catch (storageError) {
+      console.error('Error updating watch history:', storageError);
+    }
+  }, []);
+
   const fetchMovieDetails = useCallback(async () => {
     try {
       const response = await axios.get(`/api/movies/${id}`);
       setMovie(response.data);
       setLoading(false);
+      updateWatchHistory(response.data);
     } catch (error) {
       console.error('Error fetching movie details:', error);
       setError('Failed to load movie details');
       setLoading(false);
     }
-  }, [id]);
+  }, [id, updateWatchHistory]);
 
   useEffect(() => {
     fetchMovieDetails();
